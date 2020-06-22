@@ -1,24 +1,29 @@
-package br.com.caelum.leilao.main;
+package br.com.caelum.leilao.dominio;
 
-import br.com.caelum.leilao.dominio.Avaliador;
-import br.com.caelum.leilao.dominio.Lance;
-import br.com.caelum.leilao.dominio.Leilao;
-import br.com.caelum.leilao.dominio.Usuario;
+import org.junit.Before;
 import org.junit.Test;
 
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class TesteDoAvaliador {
+public class AvaliadorTest {
+
+    private Avaliador leiloeiro;
+    private Usuario joao;
+    private Usuario jose;
+    private Usuario maria;
+
+    @Before
+    public void criaAvaliador() {
+        this.leiloeiro = new Avaliador();
+        this.joao = new Usuario("João");
+        this.jose = new Usuario("José");
+        this.maria = new Usuario("Maria");
+    }
 
     @Test
     public void deveEntenderLancesEmOrdemCrescente() {
-
-        // cenario: 3 lances em ordem crescente
-        Usuario joao = new Usuario("João");
-        Usuario jose = new Usuario("José");
-        Usuario maria = new Usuario("Maria");
 
         Leilao leilao = new Leilao("Playstation 5 novo");
 
@@ -27,7 +32,6 @@ public class TesteDoAvaliador {
         leilao.propoe(new Lance(maria,400.0));
 
         // executando a acao
-        Avaliador leiloeiro = new Avaliador();
         leiloeiro.avalia(leilao);
 
         // comparando a saida com o esperado
@@ -37,12 +41,10 @@ public class TesteDoAvaliador {
 
     @Test
     public void deveEntenderLeilaoComApenasUmLance() {
-        Usuario fulano = new Usuario("Fulano");
         Leilao leilao = new Leilao("Apple Watch 5");
 
-        leilao.propoe(new Lance(fulano,1000.0));
+        leilao.propoe(new Lance(joao,1000.0));
 
-        Avaliador leiloeiro = new Avaliador();
         leiloeiro.avalia(leilao);
 
         assertEquals(1000.0,leiloeiro.getMaiorLance(),0.00001);
@@ -51,16 +53,14 @@ public class TesteDoAvaliador {
 
     @Test
     public void deveEncontrarOsTresMaioresLances() {
-        Usuario nina = new Usuario("Nina");
-        Usuario gabi = new Usuario("Gabi");
-        Leilao leilao = new Leilao("Havaianas de Pau");
 
-        leilao.propoe(new Lance(nina, 100.0));
-        leilao.propoe(new Lance(gabi, 200.0));
-        leilao.propoe(new Lance(nina, 300.0));
-        leilao.propoe(new Lance(gabi, 400.0));
+        Leilao leilao = new CriadorDeLeilao().para("Playstation 5")
+                .lance(joao, 100.0)
+                .lance(maria, 200.0)
+                .lance(joao, 300.0)
+                .lance(maria, 400.0)
+                .constroi();
 
-        Avaliador leiloeiro = new Avaliador();
         leiloeiro.avalia(leilao);
 
         List<Lance> maiores = leiloeiro.getTresMaiores();
